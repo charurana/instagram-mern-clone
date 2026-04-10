@@ -1,0 +1,139 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUser } from './actions/userAction';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import 'emoji-mart/css/emoji-mart.css';
+import Header from './components/Navbar/Header';
+import PrivateRoute from './Routes/PrivateRoute';
+import Profile from './components/User/Profile';
+import UpdateProfile from './components/User/Update/UpdateProfile';
+import UpdatePassword from './components/User/Update/UpdatePassword';
+import SpinLoader from './components/Layouts/SpinLoader';
+
+const Home = lazy(() => import('./components/Home/Home'));
+const Reels = lazy(() => import('./components/Home/Reels'));
+const SignUp = lazy(() => import('./components/User/SignUp'));
+const Login = lazy(() => import('./components/User/Login'));
+const ForgotPassword = lazy(() => import('./components/User/ForgotPassword'));
+const ResetPassword = lazy(() => import('./components/User/ResetPassword'));
+const Update = lazy(() => import('./components/User/Update/Update'));
+const Inbox = lazy(() => import('./components/Chats/Inbox'));
+const NotFound = lazy(() => import('./components/Errors/NotFound'));
+
+function App() {
+  const dispatch = useDispatch();
+  const { pathname } = useLocation();
+
+  toast.configure({
+    theme: 'colored',
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 2500,
+  });
+
+  const { isAuthenticated } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(loadUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+  }, [pathname]);
+
+  return (
+    <>
+      {isAuthenticated && <Header />}
+
+      <Suspense fallback={<SpinLoader />}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/watch/reels"
+            element={
+              <PrivateRoute>
+                <Reels />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/reels"
+            element={<Navigate to="/watch/reels" replace />}
+          />
+
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<SignUp />} />
+          <Route path="/password/forgot" element={<ForgotPassword />} />
+          <Route path="/password/reset/:token" element={<ResetPassword />} />
+
+          <Route
+            path="/accounts/edit"
+            element={
+              <PrivateRoute>
+                <Update activeTab={0}>
+                  <UpdateProfile />
+                </Update>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/accounts/password/change"
+            element={
+              <PrivateRoute>
+                <Update activeTab={1}>
+                  <UpdatePassword />
+                </Update>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/direct/inbox"
+            element={
+              <PrivateRoute>
+                <Inbox />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/direct/t/:chatId/:userId"
+            element={
+              <PrivateRoute>
+                <Inbox />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/:username"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
+  );
+}
+
+export default App;

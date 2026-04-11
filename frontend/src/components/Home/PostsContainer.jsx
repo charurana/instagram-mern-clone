@@ -2,21 +2,26 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { clearErrors, getPostsOfFollowing } from '../../actions/postAction'
-import { LIKE_UNLIKE_POST_RESET, NEW_COMMENT_RESET, POST_FOLLOWING_RESET, SAVE_UNSAVE_POST_RESET } from '../../constants/postConstants'
+import {
+    LIKE_UNLIKE_POST_RESET,
+    NEW_COMMENT_RESET,
+    POST_FOLLOWING_RESET,
+    SAVE_UNSAVE_POST_RESET
+} from '../../constants/postConstants'
 import UsersDialog from '../Layouts/UsersDialog'
 import PostItem from './PostItem'
-import StoriesContainer from './StoriesContainer'
+import PostDetails from './PostDetails'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SpinLoader from '../Layouts/SpinLoader'
 import SkeletonPost from '../Layouts/SkeletonPost'
 
 const PostsContainer = () => {
-
     const dispatch = useDispatch();
 
     const [usersList, setUsersList] = useState([]);
     const [usersDialog, setUsersDialog] = useState(false);
     const [page, setPage] = useState(2);
+    const [selectedPost, setSelectedPost] = useState(null);
 
     const { loading, error, posts, totalPosts } = useSelector((state) => state.postOfFollowing)
     const { error: likeError, message, success } = useSelector((state) => state.likePost)
@@ -40,7 +45,7 @@ const PostsContainer = () => {
             dispatch(clearErrors());
         }
         if (success) {
-            toast.success(message)
+            toast.success(message);
             dispatch({ type: LIKE_UNLIKE_POST_RESET });
         }
         if (commentError) {
@@ -48,7 +53,7 @@ const PostsContainer = () => {
             dispatch(clearErrors());
         }
         if (commentSuccess) {
-            toast.success("Comment Added")
+            toast.success("Comment Added");
             dispatch({ type: NEW_COMMENT_RESET });
         }
         if (saveError) {
@@ -56,40 +61,68 @@ const PostsContainer = () => {
             dispatch(clearErrors());
         }
         if (saveSuccess) {
-            toast.success(saveMessage)
+            toast.success(saveMessage);
             dispatch({ type: SAVE_UNSAVE_POST_RESET });
         }
-    }, [dispatch, success, likeError, message, commentError, commentSuccess, saveError, saveSuccess, saveMessage])
+    }, [
+        dispatch,
+        success,
+        likeError,
+        message,
+        commentError,
+        commentSuccess,
+        saveError,
+        saveSuccess,
+        saveMessage
+    ]);
 
     const fetchMorePosts = () => {
-        setPage((prev) => prev + 1)
-        dispatch(getPostsOfFollowing(page));
-    }
+        const nextPage = page + 1;
+        setPage(nextPage);
+        dispatch(getPostsOfFollowing(nextPage));
+    };
 
     return (
         <>
             <div className="flex flex-col w-full lg:w-2/3 sm:mt-6 sm:px-8 mb-8">
-
-                <StoriesContainer />
-
                 {loading &&
-                    Array(5).fill("").map((el, i) => (<SkeletonPost key={i} />))
+                    Array(5).fill("").map((_, i) => <SkeletonPost key={i} />)
                 }
+
                 <InfiniteScroll
-                    dataLength={posts.length}
+                    dataLength={posts?.length || 0}
                     next={fetchMorePosts}
-                    hasMore={posts.length !== totalPosts}
+                    hasMore={(posts?.length || 0) !== totalPosts}
                     loader={<SpinLoader />}
                 >
                     <div className="w-full h-full mt-1 sm:mt-6 flex flex-col space-y-4">
                         {posts?.map((post) => (
-                            <PostItem key={post._id} {...post} setUsersDialog={setUsersDialog} setUsersList={setUsersList} />
+                            <PostItem
+                                key={post._id}
+                                {...post}
+                                setUsersDialog={setUsersDialog}
+                                setUsersList={setUsersList}
+                                onOpenPost={() => setSelectedPost(post)}
+                            />
                         ))}
                     </div>
                 </InfiniteScroll>
 
-                <UsersDialog title="Likes" open={usersDialog} onClose={handleClose} usersList={usersList} />
+                <UsersDialog
+                    title="Likes"
+                    open={usersDialog}
+                    onClose={handleClose}
+                    usersList={usersList}
+                />
 
+                {selectedPost && (
+                    <PostDetails
+                        post={selectedPost}
+                        onClose={() => setSelectedPost(null)}
+                        setUsersDialog={setUsersDialog}
+                        setUsersList={setUsersList}
+                    />
+                )}
             </div>
         </>
     )

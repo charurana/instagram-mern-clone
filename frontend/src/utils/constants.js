@@ -1,64 +1,23 @@
-export const BASE_PROFILE_IMAGE_URL='http://localhost:4000/public/uploads/profiles/';
-export const BASE_POST_IMAGE_URL='http://localhost:4000/public/uploads/posts/';
+const APP_ORIGIN =
+   process.env.NODE_ENV === "production"
+       ? window.location.origin
+       : "http://localhost:4000";
 
-export const SOCKET_ENDPOINT = "http://localhost:4000";
+// ✅ images/posts/profile ke liye
+export const BASE_PROFILE_IMAGE_URL = `${APP_ORIGIN}/uploads/profiles/`;
+export const BASE_POST_IMAGE_URL = `${APP_ORIGIN}/uploads/posts/`;
 
-// export const BASE_PROFILE_IMAGE_URL = 'https://instagrammern.herokuapp.com/public/uploads/profiles/';
-// export const BASE_POST_IMAGE_URL = 'https://instagrammern.herokuapp.com/public/uploads/posts/';
+// ✅ socket endpoint
+export const SOCKET_ENDPOINT =
+   process.env.NODE_ENV === "production"
+       ? window.location.origin
+       : "http://localhost:4000";
 
-// export const SOCKET_ENDPOINT = "https://instagrammern.herokuapp.com";
-
+// stories dummy data
 export const stories = [
-    {
-        title: "JavaScript",
-        image: "javascript"
-    },
-    {
-        title: "Node.js",
-        image: "nodejs"
-    },
-    {
-        title: "Express.js",
-        image: "expressjs"
-    },
-    {
-        title: "MongoDB",
-        image: "mongodb"
-    },
-    {
-        title: "React.js",
-        image: "reactjs"
-    },
-    {
-        title: "Socket.io",
-        image: "socketio"
-    },
-    {
-        title: "TailwindCSS",
-        image: "tailwind"
-    },
-    {
-        title: "MaterialUI",
-        image: "mui"
-    },
-    {
-        title: "Redux",
-        image: "redux"
-    },
-    {
-        title: "Multer",
-        image: "multer"
-    },
-    {
-        title: "Sendgrid",
-        image: "sendgrid"
-    },
-    {
-        title: "Axios",
-        image: "axios"
-    },
-    {
-        title: "Toastify",
-        image: "toastify"
-    },
-]
+   { title: "JavaScript", image: "javascript" },
+   { title: "Node.js", image: "node" },
+   { title: "Express.js", image: "express" },
+   { title: "MongoDB", image: "mongodb" },
+   { title: "React.js", image: "react" },
+];

@@ -8,11 +8,11 @@ const router = express.Router();
 
 const avatarStorage = multer.diskStorage({
    destination: function (req, file, cb) {
-       cb(null, path.resolve(__dirname, '../../public/uploads/profiles'))
+       cb(null, path.resolve(__dirname, '../../public/uploads/profiles'));
    },
    filename: function (req, file, cb) {
-       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-       cb(null, file.fieldname + '_' + uniqueSuffix + path.extname(file.originalname))
+       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+       cb(null, file.fieldname + '_' + uniqueSuffix + path.extname(file.originalname));
    }
 });
 
@@ -36,9 +36,6 @@ router.get("/users/suggested", isAuthenticated, userController.getAllUsers);
 router.get("/users", isAuthenticated, userController.searchUsers);
 
 router.get("/follow/:id", isAuthenticated, userController.followUser);
-
-router.get("/notifications", isAuthenticated, userController.getNotifications);
-router.put("/notifications/read", isAuthenticated, userController.markNotificationsRead);
 
 router.put("/update/profile", isAuthenticated, avatarUpload.single('avatar'), userController.updateProfile);
 router.put("/update/password", isAuthenticated, userController.updatePassword);
